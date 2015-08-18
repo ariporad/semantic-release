@@ -33,6 +33,10 @@ module.exports = function (config, cb) {
         semver.inc(results.lastRelease.version, results.type)
     }
 
+    // TODO: results.commits[0] is most recent commit. Waiting on
+    // https://github.com/semantic-release/semantic-release/issues/40
+    // To figure out if one [verification skip is enough to skip the
+    // whole release, or just that commit
     plugins.verifyRelease(_.assign({
       commits: results.commits,
       lastRelease: results.lastRelease,
