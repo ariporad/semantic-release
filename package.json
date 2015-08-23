@@ -1,54 +1,58 @@
 {
   "name": "semantic-release",
   "description": "automated semver compliant package publishing",
-  "version": "0.0.0-semantically-released",
-  "author": "Stephan Bönnemann <stephan@boennemann.me>",
-  "bin": "./bin/semantic-release.js",
+  "author": "Stephan Bönnemann <stephan@boennemann.me> (http://boennemann.me)",
+  "bin": {
+    "semantic-release": "./bin/semantic-release.js"
+  },
   "bugs": {
-    "url": "https://github.com/boennemann/semantic-release/issues"
+    "url": "https://github.com/semantic-release/semantic-release/issues"
+  },
+  "engines": {
+    "node": ">=0.10",
+    "npm": ">=2"
   },
   "config": {
     "nyc": {
       "exclude": [
-        ".tests",
+        ".test",
         "node_modules"
       ]
     }
   },
   "dependencies": {
-    "abbrev": "^1.0.5",
-    "async": "^1.0.0",
-    "conventional-changelog": "0.0.17",
-    "error-first-handler": "^1.0.1",
+    "@semantic-release/commit-analyzer": "^2.0.0",
+    "@semantic-release/condition-travis": "^4.1.0",
+    "@semantic-release/error": "^1.0.0",
+    "@semantic-release/last-release-npm": "^1.2.1",
+    "@semantic-release/release-notes-generator": "^2.0.0",
     "git-head": "^1.2.1",
-    "github": "0.2.4",
-    "github-url-from-git": "^1.4.0",
-    "ini": "^1.3.2",
-    "minimist": "^1.1.0",
+    "github": "^0.2.4",
+    "lodash": "^3.9.3",
+    "nerf-dart": "^1.0.0",
+    "nopt": "^3.0.3",
     "npmconf": "^2.1.2",
+    "npmlog": "^1.2.1",
     "parse-github-repo-url": "^1.0.0",
-    "request": "^2.53.0",
-    "semver": "^4.3.3"
+    "require-relative": "^0.8.7",
+    "run-auto": "^1.1.2",
+    "run-series": "^1.1.2",
+    "semver": "^5.0.1"
   },
   "devDependencies": {
+    "babel": "^5.5.8",
     "coveralls": "^2.11.2",
-    "cracks": "^2.0.1",
-    "github-release-fake-server": "^1.3.0",
-    "lodash.defaults": "^3.0.0",
-    "nano-uid": "^0.2.0",
+    "mkdirp": "^0.5.1",
     "nixt": "^0.4.1",
-    "nock": "^2.2.0",
-    "nyc": "^2.3.0",
-    "sinopia": "^1.0.0",
-    "standard": "^4.0.1",
-    "tap": "^1.2.0"
+    "nock": "^2.5.0",
+    "npm-registry-couchapp": "^2.6.11",
+    "nyc": "^3.0.0",
+    "proxyquire": "^1.5.0",
+    "rimraf": "^2.4.0",
+    "standard": "^5.0.2",
+    "tap": "^1.3.1"
   },
-  "engines": {
-    "iojs": "^1",
-    "node": "^0.10",
-    "npm": "^2"
-  },
-  "homepage": "https://github.com/boennemann/semantic-release",
+  "homepage": "https://github.com/semantic-release/semantic-release/tree/next#readme",
   "keywords": [
     "author",
     "automation",
@@ -61,24 +65,23 @@
     "version"
   ],
   "license": "MIT",
-  "main": "dist/main.js",
-  "optionalDependencies": {
-    "babel": "^5.5.6"
-  },
+  "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/boennemann/semantic-release.git"
+    "url": "git+https://github.com/semantic-release/semantic-release.git"
   },
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && babel src --out-dir dist",
-    "build:tests": "rm -rf .tests && mkdir -p .tests && babel tests --out-dir .tests",
+    "build": "rimraf dist && mkdirp dist && babel src --out-dir dist",
     "coverage": "nyc report",
-    "coveralls": "npm run coverage -- --reporter=lcovonly && cat coverage/lcov.info | coveralls",
-    "postpublish": "./bin/semantic-release.js post",
-    "prepublish": "npm run build && ./bin/semantic-release.js pre",
-    "pretest:integration": "npm run build && npm run build:tests",
-    "test": "./bin/test",
-    "test:integration": "nyc tap --no-cov .tests/{scenarios,tap}/*.js",
-    "test:style": "standard"
+    "coverage:upload": "npm run coverage -- --reporter=lcovonly && coveralls < coverage/lcov.info",
+    "prepublish": "npm run build",
+    "pretest:integration": "npm run build && npm run test:build",
+    "pretest:unit": "npm run build && npm run test:build",
+    "semantic-release": "./bin/semantic-release.js pre && npm dedupe && npm publish && ./bin/semantic-release.js post",
+    "test": "npm run test:style && npm run test:unit",
+    "test:build": "rimraf .test && mkdirp .test && babel test --out-dir .test",
+    "test:integration": "tap --no-cov .test/scenarios/*.js",
+    "test:style": "standard",
+    "test:unit": "nyc tap --no-cov .test/specs/*.js"
   }
 }
